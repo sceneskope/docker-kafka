@@ -1,0 +1,23 @@
+[Unit]
+Description=kafka
+After=zookeeper.service
+Requires=zookeeper.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker kill kafka
+ExecStartPre=-/usr/bin/docker rm kafka
+#ExecStartPre=/usr/bin/docker pull sceneskope/kafka:0.8.2.1
+ExecStart=/usr/bin/docker run \
+	--rm \
+	--name kafka \
+	--publish 9092:9092 \
+	--volume /var/kafka:/tmp/kafka-logs \
+	--env KAFKA_ADVERTISED_HOST_NAME=server.home \
+	--env KAFKA_ZOOKEEPER_CONNECT=server.home:2181 \
+	--env KAFKA_AUTO_CREATE_TOPICS=false \
+	sceneskope/kafka:0.8.2.1
+
+ExecStop=/usr/bin/docker stop kafka
+Restart=always
+RestartSec=10s
+
